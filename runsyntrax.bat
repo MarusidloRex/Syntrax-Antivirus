@@ -1,0 +1,278 @@
+@echo off
+
+if not exist flpth.syntrax (
+  cls
+  title Je požadována vaše akce - Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Je požadována vaše akce.
+  echo.
+  echo.
+  echo Vzhledem k neznámé chybě od vás žádáme umístění složky, ze které
+  echo je Syntrax Antivirus spouštěn.
+  echo.
+  set /p Syntraxdir="Prosíme, zadejte umístění složky: "
+  echo %Syntraxdir% > flpth.Syntrax
+  cls
+)
+set /p Syntraxdir=<flpth.Syntrax
+
+systeminfo | findstr /B /C:"OS Name" > operacnisystem.Syntrax
+find /i /c "Microsoft Windows 8" operacnisystem.Syntrax >NUL
+if %errorlevel% equ 0 (
+  del operacnisystem.Syntrax
+  Microsoft Windows 8 > win8sys.Syntrax
+  cls
+  title Je požadována vaše akce - Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Je požadována vaše akce.
+  echo.
+  echo.
+  echo Bylo detekováno, že používáte Microsoft Windows 8.
+  echo Tento operační systém nemusí být plně kompatibilní s Syntrax Total
+  echo Security, a proto budou některé funkce vypnuty a na skeny bude
+  echo užívána pouze jedna ze dvou metod. Toto může mít za následek
+  echo označení viru jako bezpečný soubor. Využívání Syntrax Total
+  echo Security však nebude omezeno úplně a všechny kompatibilní funkce
+  echo budou přístupné.
+  echo.
+  echo Pokračováním s tímto počítáte.
+  pause
+) else (
+  del operacnisystem.Syntrax
+)
+
+if exist lcncklc.Syntrax goto menu
+
+:licencni_klic
+cls
+title Je požadována vaše akce - Syntrax Antivirus
+echo Syntrax Antivirus
+echo.
+echo Je požadována vaše akce.
+echo.
+echo.
+echo Prosíme, zadejte váš licenční klíč.
+echo Pokud ještě nemáte zakoupený potřebný licenční klíč, prosíme, zakupte si ho
+echo na oficiálních stránkách Syntrax.
+echo.
+set /p "klic=Zde zadejte váš licenční klíč: "
+if /i "%klic%" == "SAXHP-IY7DC-ORJU5-6HG7A-LQVCC" (
+  echo.
+  echo Vyčkejte, právě zpracováváme zadaný klíč.
+  echo Klic pridan > lcncklc.Syntrax
+  echo.
+  echo Dokončeno. Váš klíč byl přijat.
+  echo Syntrax Antivirus je nyní odemčen.
+  pause
+  goto menu
+)
+echo.
+echo Vámi zadaný klíč nebyl přijat.
+pause
+goto licencni_klic
+
+:menu
+  cls
+  title Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Jste zabezpečeni.
+  echo.
+  echo.
+  echo (SKEN) - začne skenovat.
+  echo (NASTAVENÍ) - zobrazí možnosti nastavení.
+  echo (OPUSTIT) - zavře Syntrax Antivirus.
+  echo.
+  set /p volba="Prosíme, zvolte volbu: "
+  if /i "%volba%" == "sken" goto sken
+  if /i "%volba%" == "nastavení" goto nastaveni
+  if /i "%volba%" == "opustit" exit
+  echo.
+  echo Toto není platná volba.
+  pause
+  goto menu
+  
+:nastaveni
+  cls
+  echo Syntrax Antivirus
+  echo.
+  echo Jste zabezpečeni.
+  echo.
+  echo.
+  echo (INFO) - zobrazí informace o Syntrax Antivirus.
+  echo (NAHLÁSIT) - nahlásí chybu, špatně označený program apod.
+  echo (ZPĚT) - přejde zpět do menu.
+  echo.
+  set /p volba="Prosíme, zvolte volbu: "
+  if /i "%volba%" == "info" goto info
+  if /i "%volba%" == "nahlásit" start https://martinekmatej.wixsite.com/Syntrax/contact
+  if /i "%volba%" == "zpět" goto menu
+  
+:info
+  cls
+  echo Syntrax Antivirus
+  echo.
+  echo Informace
+  echo.
+  echo.
+  echo Syntrax Antivirus
+  echo.
+  echo Experimentální verze
+  echo Edice c921b374-8e42-4bc5-bc49-a6b9842b207b
+  echo.
+  echo Copyright Syntrax 2022.
+  pause
+  goto nastaveni
+
+:sken
+  cls
+  echo Syntrax Antivirus
+  echo.
+  echo Jste zabezpečeni.
+  echo.
+  echo.
+  echo (ZPĚT) - přejde zpět do menu.
+  echo.
+  set /p soubor="Prosíme, zadejte umístění skenovaného souboru nebo zvolte volbu: "
+  if /i "%soubor%" == "zpět" goto menu
+  
+  cls
+  title Probíhá sken - Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Právě probíhá sken.
+  echo.
+  echo.
+  echo Prosíme, vyčkejte, než se sken dokončí.
+  echo.
+  echo Načítání potřebných souborů...
+  if exist win8sys.Syntrax goto yara
+  echo Kalkulace MD5 hashe...
+  @CertUtil -hashfile %soubor% MD5 > md5.Syntrax
+  for /f "tokens=1*delims=:" %%G in ('findstr /n "^" md5.Syntrax') do if %%G equ 2 set md5=%%H
+  del md5.Syntrax
+  echo Nastavování potřebných parametrů...
+  set hrozba=0
+
+  rem --------------------------------------------------------------------------------------------------------------------
+
+  set md5=%md5: =%
+  
+  echo Skenovani MD5 hashe...
+
+  if "%md5%" == "46a3c0264a808d8884ba9d50ba6e3874" set hrozba=DOS.Virus.Consumed.A
+  if "%md5%" == "44d88612fea8a8f36de82e1278abb02f" set hrozba=EicarTestFile.A
+  if "%md5%" == "9b533c3e1e028eff67c9f97ead1cf7c8" set hrozba=Win32.Ransom.7ev3n.A
+  if "%md5%" == "768a4aa523b9d3f3bc44b4ebdee706dc" set hrozba=Win32.Ransom.7ev3n.B
+  if "%md5%" == "7ab91e57a1e2752cd8abee3db10853c5" set hrozba=Win32.Ransom.AngryDuck.A
+  if "%md5%" == "e76eca2f7d0450c84417a8ac242b424c" set hrozba=Win32.Ransom.Donut.A
+  if "%md5%" == "63d4e4dac57bd7d2059587eba4162652" set hrozba=Win32.Ransom.SureRansom.A
+  if "%md5%" == "50a1420208213d0ca9e1a24fd2806882" set hrozba=Win32.Ransom.XiaoBa.A
+  if "%md5%" == "e4bb04fe99f81331aa57a5c17b4c9111" set hrozba=Win32.Ransom.Xorist.A
+  if "%md5%" == "58c72587910a4f82c7942ee89fe227b7" set hrozba=Win32.RAT.Warzone.A
+  if "%md5%" == "477d35e62bfe6045774ae74b616e4844" set hrozba=Win32.Trojan.Zeus.A
+  if "%md5%" == "002fa5e60703f6178140ec644c298716" set hrozba=Win32.Virus.Gollum.A
+  if "%md5%" == "05632175cc24f9253c06221a6faa5870" set hrozba=Win32.Virus.Winvir.A
+  
+  rem --------------------------------------------------------------------------------------------------------------------
+
+  if not "%hrozba%" == "0" goto hrozba
+  
+  :yara
+  echo Přesouvání do databáze...
+  cd %Syntraxdir%
+  cd yara
+  
+  echo Načítání potřebných souborů...
+  echo 0 > yara.Syntrax
+  
+  echo Skenování na základě pravidel YARA...
+  
+  rem --------------------------------------------------------------------------------------------------------------------
+  
+  yara EicarTestFile.yar %soubor% > yara.Syntrax
+  yara Win32-Adware-Mobogenie.yar %soubor% > yara.Syntrax
+  yara Win32-Trojan-Spectroid.yar %soubor% > yara.Syntrax
+  yara Win32-Trojan-Winnti.yar %soubor% > yara.Syntrax
+  
+  rem --------------------------------------------------------------------------------------------------------------------
+
+  set /p hrozba=<yara.Syntrax
+  del yara.Syntrax
+  if "%hrozba%" == "0" goto bezpecny
+  
+:hrozba
+  cls
+  title Je požadována vaše akce - Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Je požadována vaše akce.
+  echo.
+  echo.
+  echo Soubor %soubor% byl označen jako infikovaný.
+  echo.
+  echo Detekováno: %hrozba%
+  echo.
+  echo (SMAZAT) - smaže soubor.
+  echo (KARANTÉNA) - přesune soubor do karantény.
+  echo (IGNOROVAT) - ignoruje hrozbu. (nedoporučeno)
+  echo.
+  set /p volba="Prosíme, zvolte volbu: "
+  if /i "%volba%" == "smazat" (
+    echo.
+    del %soubor%
+    if %errorlevel% equ 1 (
+      echo.
+      echo Soubor se nepodařilo smazat.
+      pause
+      goto hrozba
+    ) else (
+      echo.
+      echo Soubor byl úspěšně smazán.
+      pause
+      goto sken
+    )
+  )
+  if /i "%volba%" == "karanténa" (
+    echo.
+    cd %Syntraxdir%
+    if not exist quarant\ mkdir quarant
+    move /Y %soubor% quarant\%hrozba%.Syntraxquarant
+    cipher /e quarant\%hrozba%.Syntraxquarant
+    if %errorlevel% equ 1 (
+      echo.
+      echo Soubor se nepodařilo přesunout do karantény.
+      pause
+      goto hrozba
+    ) else (
+      echo.
+      echo Soubor byl úspěšně přesunut do karantény.
+      pause
+      goto sken
+    )
+  )
+  if /i "%volba%" == "ignorovat" (
+    echo.
+    echo Hrozba byla ignorována.
+    pause
+    goto sken
+  )
+  echo.
+  echo Toto není platná volba.
+  pause
+  goto hrozba
+
+:bezpecny
+  cls
+  title Sken byl dokončen - Syntrax Antivirus
+  echo Syntrax Antivirus
+  echo.
+  echo Sken byl dokončen.
+  echo.
+  echo.
+  echo Soubor %soubor% byl označen jako čistý.
+  echo.
+  pause
+  goto sken
